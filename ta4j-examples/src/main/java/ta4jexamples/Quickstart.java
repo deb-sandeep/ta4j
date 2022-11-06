@@ -27,6 +27,7 @@ import org.ta4j.core.AnalysisCriterion;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BarSeriesManager;
 import org.ta4j.core.BaseStrategy;
+import org.ta4j.core.Indicator ;
 import org.ta4j.core.Rule;
 import org.ta4j.core.TradingRecord;
 import org.ta4j.core.criteria.ReturnOverMaxDrawdownCriterion;
@@ -35,7 +36,6 @@ import org.ta4j.core.criteria.WinningPositionsRatioCriterion;
 import org.ta4j.core.criteria.pnl.GrossReturnCriterion;
 import org.ta4j.core.indicators.SMAIndicator;
 import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
-import org.ta4j.core.num.Num;
 import org.ta4j.core.rules.CrossedDownIndicatorRule;
 import org.ta4j.core.rules.CrossedUpIndicatorRule;
 import org.ta4j.core.rules.StopGainRule;
@@ -54,18 +54,19 @@ public class Quickstart {
 
         // Getting a bar series (from any provider: CSV, web service, etc.)
         BarSeries series = CsvTradesLoader.loadBitstampSeries();
+        System.out.println( "Num bars = " + series.getBarCount() ) ;
 
-        // Getting the close price of the bars
-        Num firstClosePrice = series.getBar(0).getClosePrice();
-        System.out.println("First close price: " + firstClosePrice.doubleValue());
         // Or within an indicator:
         ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
-        // Here is the same close price:
-        System.out.println(firstClosePrice.isEqual(closePrice.getValue(0))); // equal to firstClosePrice
+        Double[] values = Indicator.toDouble( closePrice, 0, closePrice.getBarSeries().getBarCount() ) ;
+        System.out.println( "Num close prices = " + values.length ) ;
 
         // Getting the simple moving average (SMA) of the close price over the last 5
         // bars
-        SMAIndicator shortSma = new SMAIndicator(closePrice, 5);
+        SMAIndicator shortSma = new SMAIndicator(closePrice, 20);
+        for( int i=0; i<values.length; i++ ) {
+            System.out.println( "SMA " + i + " = " + shortSma.getValue( i ) ) ;
+        }
         // Here is the 5-bars-SMA value at the 42nd index
         System.out.println("5-bars-SMA value at the 42nd index: " + shortSma.getValue(42).doubleValue());
 
